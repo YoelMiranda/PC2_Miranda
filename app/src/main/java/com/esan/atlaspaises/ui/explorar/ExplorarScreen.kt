@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
@@ -28,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -114,6 +116,11 @@ fun ExplorarScreen(
             }
         }
 
+        FiltroRegiones(
+            seleccionada = estado.regionSeleccionada,
+            onSeleccionar = viewModel::seleccionarRegion
+        )
+
         if (estado.cargando && estado.paises.isNotEmpty()) {
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
@@ -174,6 +181,32 @@ fun ExplorarScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FiltroRegiones(
+    seleccionada: Region?,
+    onSeleccionar: (Region?) -> Unit
+) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            FilterChip(
+                selected = seleccionada == null,
+                onClick = { onSeleccionar(null) },
+                label = { Text("Todas") }
+            )
+        }
+        items(Region.entries) { region ->
+            FilterChip(
+                selected = seleccionada == region,
+                onClick = { onSeleccionar(region) },
+                label = { Text(region.etiqueta) }
+            )
         }
     }
 }

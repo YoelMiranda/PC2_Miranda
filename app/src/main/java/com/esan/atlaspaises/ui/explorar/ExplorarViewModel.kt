@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.esan.atlaspaises.data.local.PaisEntity
 import com.esan.atlaspaises.data.repository.PaisRepository
 import com.esan.atlaspaises.domain.Consulta
+import com.esan.atlaspaises.domain.Region
 import com.esan.atlaspaises.ui.comparadorNombres
 import com.esan.atlaspaises.ui.mensajeDeError
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +33,9 @@ data class ExplorarUiState(
     val hayMas: Boolean = false,
     val error: String? = null,
     val sinResultados: Boolean = false
-)
+) {
+    val regionSeleccionada: Region? get() = (consulta as? Consulta.PorRegion)?.region
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -104,6 +107,12 @@ class ExplorarViewModel @Inject constructor(
     fun limpiarBusqueda() {
         texto.value = ""
         if (control.value.consulta is Consulta.PorNombre) cargar(Consulta.Todos)
+    }
+
+    /** null = "Todas". El filtro por región reemplaza a la búsqueda por nombre. */
+    fun seleccionarRegion(region: Region?) {
+        texto.value = ""
+        cargarSiCambio(region?.let { Consulta.PorRegion(it) } ?: Consulta.Todos)
     }
 
     fun cargarMas() {
