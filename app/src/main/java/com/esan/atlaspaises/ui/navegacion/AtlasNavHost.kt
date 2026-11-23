@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.esan.atlaspaises.ui.explorar.ExplorarScreen
 
 private object Rutas {
     const val EXPLORAR = "explorar"
@@ -89,7 +90,7 @@ fun AtlasNavHost(navController: NavHostController = rememberNavController()) {
             modifier = Modifier.padding(padding)
         ) {
             composable(Rutas.EXPLORAR) {
-                PantallaProvisional("Explorar")
+                ExplorarScreen()
             }
             composable(Rutas.MIS_PAISES) {
                 PantallaProvisional("Mis países")
