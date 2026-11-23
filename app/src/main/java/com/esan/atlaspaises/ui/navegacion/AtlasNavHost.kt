@@ -1,24 +1,19 @@
 package com.esan.atlaspaises.ui.navegacion
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.outlined.Bookmarks
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -32,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.esan.atlaspaises.ui.detalle.DetalleScreen
 import com.esan.atlaspaises.ui.explorar.ExplorarScreen
+import com.esan.atlaspaises.ui.mispaises.MisPaisesScreen
 
 private object Rutas {
     const val EXPLORAR = "explorar"
@@ -96,7 +92,7 @@ fun AtlasNavHost(navController: NavHostController = rememberNavController()) {
                 ExplorarScreen(onAbrirPais = { navController.navigate(Rutas.detalle(it)) })
             }
             composable(Rutas.MIS_PAISES) {
-                PantallaProvisional("Mis países")
+                MisPaisesScreen(onAbrirPais = { navController.navigate(Rutas.detalle(it)) })
             }
             composable(
                 route = Rutas.DETALLE,
@@ -105,18 +101,5 @@ fun AtlasNavHost(navController: NavHostController = rememberNavController()) {
                 DetalleScreen(onVolver = { navController.popBackStack() })
             }
         }
-    }
-}
-
-/** Pantalla temporal mientras se implementa la sección real. */
-@Composable
-private fun PantallaProvisional(titulo: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(titulo, style = MaterialTheme.typography.headlineSmall)
     }
 }
