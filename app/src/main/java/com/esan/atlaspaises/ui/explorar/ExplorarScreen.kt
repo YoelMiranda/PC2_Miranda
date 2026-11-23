@@ -1,5 +1,6 @@
 package com.esan.atlaspaises.ui.explorar
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,6 +58,7 @@ import com.esan.atlaspaises.ui.componentes.MensajeVacio
 
 @Composable
 fun ExplorarScreen(
+    onAbrirPais: (String) -> Unit,
     viewModel: ExplorarViewModel = hiltViewModel()
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
@@ -156,7 +158,8 @@ fun ExplorarScreen(
                     ) {
                         items(estado.paises, key = { it.codigo }) { pais ->
                             FilaPais(
-                                pais = pais
+                                pais = pais,
+                                onClick = { onAbrirPais(pais.codigo) }
                             )
                         }
                         // "Cargar más" solo aparece cuando la API indica que quedan resultados.
@@ -213,10 +216,13 @@ private fun FiltroRegiones(
 
 @Composable
 private fun FilaPais(
-    pais: PaisEntity
+    pais: PaisEntity,
+    onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
         Row(

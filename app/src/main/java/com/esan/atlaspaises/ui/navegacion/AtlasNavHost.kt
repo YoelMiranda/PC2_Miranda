@@ -24,10 +24,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.esan.atlaspaises.ui.detalle.DetalleScreen
 import com.esan.atlaspaises.ui.explorar.ExplorarScreen
 
 private object Rutas {
@@ -90,10 +93,16 @@ fun AtlasNavHost(navController: NavHostController = rememberNavController()) {
             modifier = Modifier.padding(padding)
         ) {
             composable(Rutas.EXPLORAR) {
-                ExplorarScreen()
+                ExplorarScreen(onAbrirPais = { navController.navigate(Rutas.detalle(it)) })
             }
             composable(Rutas.MIS_PAISES) {
                 PantallaProvisional("Mis países")
+            }
+            composable(
+                route = Rutas.DETALLE,
+                arguments = listOf(navArgument("codigo") { type = NavType.StringType })
+            ) {
+                DetalleScreen(onVolver = { navController.popBackStack() })
             }
         }
     }
