@@ -16,22 +16,32 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,6 +58,7 @@ fun ExplorarScreen(
     viewModel: ExplorarViewModel = hiltViewModel()
 ) {
     val estado by viewModel.uiState.collectAsStateWithLifecycle()
+    val foco = LocalFocusManager.current
     val listState = rememberLazyListState()
 
     // Al cambiar de búsqueda o de región, la lista vuelve arriba.
@@ -64,6 +75,44 @@ fun ExplorarScreen(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
         )
+
+        // Búsqueda: se consulta al presionar la tecla de búsqueda o el botón, no en cada letra.
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = estado.textoBusqueda,
+                onValueChange = viewModel::onTextoChange,
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Buscar país por nombre") },
+                singleLine = true,
+                trailingIcon = {
+                    if (estado.textoBusqueda.isNotEmpty()) {
+                        IconButton(onClick = viewModel::limpiarBusqueda) {
+                            Icon(Icons.Filled.Clear, contentDescription = "Limpiar búsqueda")
+                        }
+                    }
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = {
+                    foco.clearFocus()
+                    viewModel.buscar()
+                })
+            )
+            Spacer(Modifier.width(8.dp))
+            FilledIconButton(
+                onClick = {
+                    foco.clearFocus()
+                    viewModel.buscar()
+                },
+                modifier = Modifier.size(52.dp)
+            ) {
+                Icon(Icons.Filled.Search, contentDescription = "Buscar")
+            }
+        }
 
         if (estado.cargando && estado.paises.isNotEmpty()) {
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())

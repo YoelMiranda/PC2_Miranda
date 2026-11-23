@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class ExplorarUiState(
+    val textoBusqueda: String = "",
     val consulta: Consulta = Consulta.Todos,
     val paises: List<PaisEntity> = emptyList(),
     val cargando: Boolean = false,
@@ -54,6 +55,7 @@ class ExplorarViewModel @Inject constructor(
         val error: String? = null
     )
 
+    private val texto = MutableStateFlow("")
     private val control = MutableStateFlow(Control())
     private var trabajo: Job? = null
 
@@ -66,8 +68,9 @@ class ExplorarViewModel @Inject constructor(
         }
         .map { lista -> lista.sortedWith(compareBy(comparadorNombres) { it.nombreComun }) }
 
-    val uiState: StateFlow<ExplorarUiState> = combine(control, paises) { control, paises ->
+    val uiState: StateFlow<ExplorarUiState> = combine(texto, control, paises) { texto, control, paises ->
         ExplorarUiState(
+            textoBusqueda = texto,
             consulta = control.consulta,
             paises = paises,
             cargando = control.cargando,
@@ -82,6 +85,25 @@ class ExplorarViewModel @Inject constructor(
     init {
         // Solo se consulta la API al crear el ViewModel; al cambiar de pestaña se conserva lo cargado.
         cargar(Consulta.Todos)
+    }
+
+    fun onTextoChange(nuevo: String) {
+        texto.value = nuevo
+    }
+
+    /** Se llama con la tecla de búsqueda del teclado o con el botón, no en cada letra. */
+    fun buscar() {
+        val consultaTexto = texto.value.trim()
+        if (consultaTexto.isEmpty()) {
+            cargarSiCambio(Consulta.Todos)
+        } else {
+            cargarSiCambio(Consulta.PorNombre(consultaTexto))
+        }
+    }
+
+    fun limpiarBusqueda() {
+        texto.value = ""
+        if (control.value.consulta is Consulta.PorNombre) cargar(Consulta.Todos)
     }
 
     fun cargarMas() {
@@ -110,6 +132,13 @@ class ExplorarViewModel @Inject constructor(
     fun reintentar() {
         val actual = control.value
         if (actual.codigos == null) cargar(actual.consulta) else cargarMas()
+    }
+
+    /** Evita repetir la misma consulta a la API si ya está cargada sin errores (el plan gratuito tiene límite). */
+    private fun cargarSiCambio(consulta: Consulta) {
+        val actual = control.value
+        if (actual.consulta == consulta && actual.codigos != null && actual.error == null) return
+        cargar(consulta)
     }
 
     private fun cargar(consulta: Consulta) {
