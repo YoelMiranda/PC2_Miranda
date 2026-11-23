@@ -50,10 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.esan.atlaspaises.data.local.PaisEntity
+import com.esan.atlaspaises.domain.EstadoVisita
 import com.esan.atlaspaises.domain.Region
 import com.esan.atlaspaises.ui.NO_DISPONIBLE
 import com.esan.atlaspaises.ui.componentes.AvisoError
 import com.esan.atlaspaises.ui.componentes.Bandera
+import com.esan.atlaspaises.ui.componentes.BotonEstado
 import com.esan.atlaspaises.ui.componentes.MensajeVacio
 
 @Composable
@@ -159,7 +161,8 @@ fun ExplorarScreen(
                         items(estado.paises, key = { it.codigo }) { pais ->
                             FilaPais(
                                 pais = pais,
-                                onClick = { onAbrirPais(pais.codigo) }
+                                onClick = { onAbrirPais(pais.codigo) },
+                                onCambiarEstado = { viewModel.cambiarEstado(pais.codigo, it) }
                             )
                         }
                         // "Cargar más" solo aparece cuando la API indica que quedan resultados.
@@ -217,7 +220,8 @@ private fun FiltroRegiones(
 @Composable
 private fun FilaPais(
     pais: PaisEntity,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onCambiarEstado: (EstadoVisita?) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -255,6 +259,11 @@ private fun FilaPais(
                     overflow = TextOverflow.Ellipsis
                 )
             }
+            Spacer(Modifier.width(8.dp))
+            BotonEstado(
+                estado = EstadoVisita.desde(pais.estado),
+                onCambiar = onCambiarEstado
+            )
         }
     }
 }

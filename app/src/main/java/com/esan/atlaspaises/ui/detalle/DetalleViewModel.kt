@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.esan.atlaspaises.data.local.PaisEntity
 import com.esan.atlaspaises.data.repository.PaisRepository
+import com.esan.atlaspaises.domain.EstadoVisita
 import com.esan.atlaspaises.ui.mensajeDeError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -59,4 +60,7 @@ class DetalleViewModel @Inject constructor(
         }
     }
 
+    fun cambiarEstado(estado: EstadoVisita?) {
+        viewModelScope.launch { repositorio.cambiarEstado(codigo, estado) }
+    }
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.esan.atlaspaises.data.local.PaisEntity
 import com.esan.atlaspaises.data.repository.PaisRepository
 import com.esan.atlaspaises.domain.Consulta
+import com.esan.atlaspaises.domain.EstadoVisita
 import com.esan.atlaspaises.domain.Region
 import com.esan.atlaspaises.ui.comparadorNombres
 import com.esan.atlaspaises.ui.mensajeDeError
@@ -141,6 +142,10 @@ class ExplorarViewModel @Inject constructor(
     fun reintentar() {
         val actual = control.value
         if (actual.codigos == null) cargar(actual.consulta) else cargarMas()
+    }
+
+    fun cambiarEstado(codigo: String, estado: EstadoVisita?) {
+        viewModelScope.launch { repositorio.cambiarEstado(codigo, estado) }
     }
 
     /** Evita repetir la misma consulta a la API si ya está cargada sin errores (el plan gratuito tiene límite). */

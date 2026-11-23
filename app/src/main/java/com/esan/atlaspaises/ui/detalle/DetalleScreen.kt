@@ -39,9 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.esan.atlaspaises.data.local.PaisEntity
+import com.esan.atlaspaises.domain.EstadoVisita
 import com.esan.atlaspaises.domain.Region
 import com.esan.atlaspaises.ui.componentes.AvisoError
 import com.esan.atlaspaises.ui.componentes.Bandera
+import com.esan.atlaspaises.ui.componentes.BotonEstado
 import com.esan.atlaspaises.ui.componentes.MensajeVacio
 import com.esan.atlaspaises.ui.formatearArea
 import com.esan.atlaspaises.ui.formatearPoblacion
@@ -84,7 +86,7 @@ fun DetalleScreen(
                 )
             }
             when {
-                pais != null -> ContenidoDetalle(pais = pais)
+                pais != null -> ContenidoDetalle(pais = pais, onCambiarEstado = viewModel::cambiarEstado)
                 estado.cargando -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -100,7 +102,8 @@ fun DetalleScreen(
 
 @Composable
 private fun ContenidoDetalle(
-    pais: PaisEntity
+    pais: PaisEntity,
+    onCambiarEstado: (EstadoVisita?) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -130,6 +133,8 @@ private fun ContenidoDetalle(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
+        Spacer(Modifier.height(12.dp))
+        BotonEstado(estado = EstadoVisita.desde(pais.estado), onCambiar = onCambiarEstado)
         Spacer(Modifier.height(16.dp))
 
         Card(
