@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,13 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
+
+// La clave de REST Countries vive solo en local.properties (ignorado por git) y llega al código por BuildConfig.
+val localProperties = Properties().apply {
+    val archivo = rootProject.file("local.properties")
+    if (archivo.exists()) archivo.inputStream().use { load(it) }
+}
+val restCountriesApiKey: String = localProperties.getProperty("RESTCOUNTRIES_API_KEY", "")
 
 android {
     namespace = "com.esan.atlaspaises"
@@ -18,6 +27,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "RESTCOUNTRIES_API_KEY", "\"$restCountriesApiKey\"")
+        buildConfigField("String", "RESTCOUNTRIES_BASE_URL", "\"https://api.restcountries.com/\"")
     }
 
     buildTypes {
@@ -41,6 +53,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
